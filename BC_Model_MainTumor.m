@@ -5,24 +5,24 @@ timestart= 0;
 timeend=10;
 
 a_1 = 0.35; 
-a_3 = 0.25; 
-a_2 = 1-a_1-a_3; 
+a_2 = 0.65; 
+a_3 = 1-a_1-a_2; 
 
 
 k_1 = 6*10^4; 
-k_2 = 10^9; 
+k_2 = 10^12; 
 k_3 = 3*10^8;
 
-delta_1 = 10^-3;
-delta_2 = 0.05; 
+delta_1 = 0.0005;
+delta_2 = 0.87222; 
 delta_3 = 0.462; 
 
-lambda = 0.07; 
-eta = 0.3954; 
+lambda = 1; 
+eta = 1; 
 
 a_ea = 2.4; 
-gamma_sc = 10^(-4); 
-gamma_ea = .1; 
+gamma_sc = 10^(-9); 
+gamma_ea = 10^(-9); 
 
 xi_T = 0.35; 
 xi_ea = 9.42*10^(-12); 
@@ -30,8 +30,19 @@ xi_ea = 9.42*10^(-12);
 s = 1.4; 
 d = 0.35; 
 ell = 2/3; 
-V= 1; 
-k=10^9;
+%V= 1; 
+%k=10^9;
+mu = 6.3;
+alpha =1;
+ab=0.3;
+c1=100;
+c2=300;
+c3=300;
+d=7*10^(-4);
+delta0=10^(-5);
+delta4=10^(-5);
+f=0.62;
+r=0.01;
 
 tau = 1; %Non-dimensionalization
 Delta = 1;  %Non-dimensionalization
@@ -39,7 +50,7 @@ epsilon = 1; %Non-dimensionalization
 sigma = 1;
 
 par=[
-    a_1; %1
+a_1; %1
 a_3; %2
 a_2; %3
 k_1; %4
@@ -58,12 +69,21 @@ xi_ea; %16
 s; %17
 d; %18
 ell; %19
-tau; %20
-Delta; %21
-epsilon;%22
-sigma;%23
-V;%24
-k;%25
+mu; %20
+alpha;%21
+ab;%22
+c1;%23
+c2;%24
+c3;%25
+d;%26
+delta0;%27
+delta4;%28
+f;%29
+r;%30
+tau; %31
+Delta; %32
+epsilon;%33
+sigma;%34
 ];
 Data(:,1)=[3; 6; 9; 12; 15; 18; 21; 27; 30]; %time in days - from Wilson/Levy paper
 Data(:,2)=[2.82; 9.83; 21.7; 25.08; 39.29; 60.12; 99.53; 169.38; 249.01]; %size of tumor (mm^2)
@@ -81,9 +101,11 @@ ndData(:,2)=(Data(:,2)/Cellsize)/sigma;
 
 %Initial conditions
 
-InitCond(1)=0;%D_Sc=Y(1);
-InitCond(2)=0;%D_Tumor=Y(2)
-InitCond(3)=ndData(1,2);%Ea_Tumor=Y(3)
+InitCond(1)=10^6*(1/79);%D_Sc=Y(1);
+InitCond(2)=10^6*(1/79);%Ea_Tumor=Y(2)
+InitCond(3)=10^6;%D_Tumor=Y(3)
+InitCond(4)=10^4;%B
+InitCond(5)=10^6*(20/79);%R
 
 
 
@@ -91,9 +113,9 @@ InitCond(3)=ndData(1,2);%Ea_Tumor=Y(3)
 %solution is found. We will solve the ODEs for each segment of treatment
 %time (using the previous segment of time as the initial condition)
 
-TreatTimes=[0,1/48,14,14+1/48,21,21+1/48,47]/tau; %nondimensional (due to the division by tau)
+%TreatTimes=[0,1/48,14,14+1/48,21,21+1/48,47]/tau; %nondimensional (due to the division by tau)
 %       treatment times, these are the times the treatment either turns on or off 
-TreatValues=[2*10^5,0,2*10^5,0,2*10^5,0,0]/V; %amount of treatment given at specified times
+%TreatValues=[2*10^5,0,2*10^5,0,2*10^5,0,0]/V; %amount of treatment given at specified times
 % the first value is the amount given in between the first two treatment
 % times, the second valued is the amount given between the second and third
 % treatment times, the last value will not be used. these are
@@ -107,7 +129,7 @@ vb=0;
 tstart=ndData(1,1);
 tend=ndData(length(ndData),1);
 %choosing which parameters to fit
-kindex=[12]; %range: 1-25
+kindex=17; %range: 1-34
 kguessrange=[par(kindex)-2, par(kindex)+2];
 
 %chooses m guesses b in range stated above for the parameter
@@ -157,16 +179,28 @@ useparam=paramfit(index);
 
 
 figure
-plot(FullT*tau,Delta*FullY(:,1))
+plot(FullT,FullY(:,1))
 xlabel('Time')
 ylabel('D_Sc')
+
 figure
-plot(FullT*tau,sigma*FullY(:,2))
-hold on
-plot(Data(:,1),Data(:,2)/Cellsize,'*')
+plot(FullT,FullY(:,2))
 xlabel('Time')
-ylabel('D_Tumor')
+ylabel('Ea_Tumor')
+
 figure
-plot(FullT*tau,epsilon*FullY(:,3))
+plot(FullT,FullY(:,3))
+%hold on
+%plot(Data(:,1),Data(:,2)/Cellsize,'*')
 xlabel('Time')
-ylabel('E_a Tumor')
+ylabel('Tumor')
+
+figure
+plot(FullT,FullY(:,4))
+xlabel('Time')
+ylabel('B')
+
+figure
+plot(FullT,FullY(:,5))
+xlabel('Time')
+ylabel('R')

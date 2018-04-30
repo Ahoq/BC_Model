@@ -13,7 +13,7 @@ function E= BC_fitdata(ndData, tstart, tend,Y0,par,vb,kguess,kindex)
 for j = 1:length(ndData(:,1))
     timepoint = ndData(j,1);
     I=find(T>= timepoint);
-    SolnVal(j,1) = Ysoln(I(1),3);
+    SolnVal(j,1) = Ysoln(I(1),5);
 end;
 E = norm((SolnVal - ndData(:,2)), 2); %finding the total error
 

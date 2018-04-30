@@ -21,12 +21,25 @@ xi_ea=par(16); %16
 s=par(17); %17
 d=par(18); %18
 ell=par(19); %19
-tau=par(20); %20
-Delta=par(21); %21
-epsilon=par(22);%22
-sigma=par(23);%23
-V=par(24);%24
-k=par(25);%25
+mu = par(20);
+alpha=par(21);
+ab=par(22);
+c1=par(23);
+c2=par(24);
+c3=par(25);
+d=par(26);
+delta0=par(27);
+delta4=par(28);
+f=par(29);
+r=par(30);
+
+tau=par(31); %20
+Delta=par(32); %21
+epsilon=par(33);%22
+sigma=par(34);%23
+%V=par(24);%24
+%k=par(25);%25
+
 
 
 
@@ -36,7 +49,7 @@ k=par(25);%25
 
 p(1)=lambda*(a_1-a_3);
 p(2)=delta_1;
-p(3)=lambda/k_1;
+p(3)=lambda;
 p(4)=lambda*(a_2+2*(a_3));
 p(5)=delta_2;
 p(6)=gamma_sc;
@@ -51,12 +64,24 @@ p(14)=ell;
 p(15)=s;
 p(16)=d;
 p(17)=1/k_2;
+p(18)=k_1;
+p(19)=f;
+p(20)=c3;
+p(21)=r;
+p(22)=delta0;
+p(23)=c1;
+p(24)=ab;
+p(25)=c2;
+p(26)=d;
+p(27)=delta4;
 
-dY=zeros(3,1); 
+dY=zeros(5,1); 
 
 D_Sc=Y(1);
-D_Tumor=Y(2);
-Ea_Tumor=Y(3);
+Ea_Tumor=Y(2);
+D_Tumor=Y(3);
+B = Y(4);
+R = Y(5);
 
 
 
@@ -72,8 +97,11 @@ end
 
 
 
-dY(1)= p(1)*D_Sc-(p(6)*Ea_Tumor*D_Sc)-(p(2)*D_Sc)-(p(3)*(D_Sc)^2);
-dY(2) = p(13)*D_Tumor*(1-(D_Tumor*p(17)))+(p(4)*D_Sc)-(p(5)*D_Tumor)-(ScriptD*D_Tumor)+p(7)*((D_Sc)^2);
-dY(3)= p(8)*Ea_Tumor*(1-(Ea_Tumor*p(9)))-p(10)*Ea_Tumor-(p(11)*D_Tumor+p(12)*D_Sc)*Ea_Tumor;
+dY(1)= p(1)*D_Sc-(p(6)*Ea_Tumor*D_Sc)-(p(2)*D_Sc);%-(p(3)*(D_Sc)^2)/p(18);
+%dY(2) = p(13)*D_Tumor*(1-(D_Tumor*p(17)))+(p(4)*D_Sc)-(p(5)*D_Tumor)-(ScriptD*D_Tumor)+p(7)*((D_Sc)^2);
+dY(2) = 5 * Ea_Tumor + p(19)* Ea_Tumor/(1+p(20)*D_Tumor*B)-p(21)*Ea_Tumor-p(10)*Ea_Tumor-p(22)*R*Ea_Tumor;
+%dY(3)= p(8)*Ea_Tumor*(1-(Ea_Tumor*p(9)))-p(10)*Ea_Tumor-(p(11)*D_Tumor+p(12)*D_Sc)*Ea_Tumor;
     
-
+dY(3)= p(13)*D_Tumor*(1-D_Tumor*p(17))+ p(4)*D_Sc-p(5)*D_Tumor-ScriptD*D_Tumor-p(22)*Ea_Tumor*D_Tumor/(1+p(23)*B)+(2*p(3)*((D_Sc)^2))/p(18);
+dY(4)= (p(24)*((D_Tumor)^2))/(p(25)+(D_Tumor)^2)-p(26)*B;
+dY(5)= p(21)*Ea_Tumor-p(27)*R;
